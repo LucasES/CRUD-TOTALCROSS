@@ -9,7 +9,7 @@ package totalcross.crud.model;
  */
 public class Book {
 
-	private Long id;
+	private int id;
 	
 	private String title;
 	
@@ -17,19 +17,23 @@ public class Book {
 	
 	private int pages;
 	
-	private int publicationYear;
-	
-	private int editionNumber;
 
 	public Book() {
 		super();
 	}
 
-	public Long getId() {
+	public Book(String title, String isbn, int pages) {
+		super();
+		this.title = title;
+		this.isbn = isbn;
+		this.pages = pages;
+	}
+
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -55,22 +59,6 @@ public class Book {
 
 	public void setPages(int pages) {
 		this.pages = pages;
-	}
-
-	public int getPublicationYear() {
-		return publicationYear;
-	}
-
-	public void setPublicationYear(int publicationYear) {
-		this.publicationYear = publicationYear;
-	}
-
-	public int getEditionNumber() {
-		return editionNumber;
-	}
-
-	public void setEditionNumber(int editionNumber) {
-		this.editionNumber = editionNumber;
 	}
 	
 }

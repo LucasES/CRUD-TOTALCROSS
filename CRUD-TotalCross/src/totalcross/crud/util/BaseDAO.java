@@ -2,30 +2,32 @@ package totalcross.crud.util;
 
 import java.sql.SQLException;
 
-import totalcross.sql.Statement;
+import totalcross.sql.PreparedStatement;
 
 public class BaseDAO {
 	
 	private static final String CREATE_TABLE_BOOK = "create table if not exists book "
-			+ "(id integer primary key autoincrement, title varchar, isbn varchar, pages integer, publicationYear integer, editionNumber integer)";
+			+ "(ID INTEGER PRIMARY KEY , title varchar, isbn varchar, pages integer, publicationYear integer, editionNumber integer)";
 	
-	private Statement statement;
-
 	public BaseDAO() {
 	}
 
 	public void createTables() {
-		statement = null;
+		PreparedStatement ps= null;
 		try {
-			statement = (Statement) new ConnectionFactory().getConnection().createStatement();
+			ps =ConnectionFactory.getConnection().prepareStatement(CREATE_TABLE_BOOK);
 
-			statement.execute(CREATE_TABLE_BOOK);
-			statement.close();
+			int returned = ps.executeUpdate();
+			if(returned > 0){
+				System.out.printf("The book table was create with success!");
+			}else{
+				System.out.println("Failed to create book table!");
+			} 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				statement.close();
+				ps.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

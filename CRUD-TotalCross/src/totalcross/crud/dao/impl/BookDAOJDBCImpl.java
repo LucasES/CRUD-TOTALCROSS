@@ -4,27 +4,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import totalcross.crud.dao.BookDAO;
 import totalcross.crud.model.Book;
 import totalcross.crud.util.ConnectionFactory;
 import totalcross.sql.PreparedStatement;
 import totalcross.sql.ResultSet;
-import totalcross.sql.Statement;
 
 /**
  * Classe responsável pela implementação do BookDAO.
  * 
  * @author Lucas Araújo - lucas.araujo@ifactory.com.br
  */
-public class BookDAOJDBCImpl implements BookDAO{
-
+public class BookDAOJDBCImpl{
+	
 	private static final String INSERT = "INSERT INTO BOOK "
-			+ "(title, isbn, pages, publicationYear, editionNumber) "
-			+ "VALUES (:title, :isbn, :pages, :publicationYear, :editionNumber)";
+			+ "(title, isbn, pages) VALUES (:title, :isbn, :pages)";
 
 	private static final String UPDATE = "UPDATE BOOK SET title = :title, "
-			+ "isbn = :isbn, pages = :pages, publicationYear = :publicationYear, editionNumber = :editionNumber "
-			+ "WHERE ID = :ID";
+			+ "isbn = :isbn, pages = :pages WHERE ID = :ID";
 
 	private static final String DELETE = "DELETE FROM BOOK WHERE ID = :ID";
 
@@ -32,18 +28,13 @@ public class BookDAOJDBCImpl implements BookDAO{
 	
 	private static final String FIND_BY_ID = "SELECT * FROM BOOK WHERE ID = :ID";
 	
-	private Statement statement;
-	
-	@Override
 	public void save(Book book) {
-		statement = null;
+		PreparedStatement ps= null;
 		try {
-			PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(INSERT);
+			ps = ConnectionFactory.getConnection().prepareStatement(INSERT);
 			ps.setString(1, book.getTitle());
 			ps.setString(2, book.getIsbn());
 			ps.setInt(3, book.getPages());
-			ps.setInt(4, book.getPublicationYear());
-			ps.setInt(5, book.getEditionNumber());
 			
 			int returned = ps.executeUpdate();
 
@@ -58,7 +49,7 @@ public class BookDAOJDBCImpl implements BookDAO{
 			e.printStackTrace();
 		} finally {
 			try {
-				statement.close();
+				ps.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -66,17 +57,14 @@ public class BookDAOJDBCImpl implements BookDAO{
 		
 	}
 
-	@Override
 	public void update(Long id, Book book) {
-		statement = null;
+		PreparedStatement ps= null;
 		try {
-			PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(UPDATE);
+			ps = ConnectionFactory.getConnection().prepareStatement(UPDATE);
 			ps.setString(1, book.getTitle());
 			ps.setString(2, book.getIsbn());
 			ps.setInt(3, book.getPages());
-			ps.setInt(4, book.getPublicationYear());
-			ps.setInt(5, book.getEditionNumber());
-			ps.setLong(6, id);
+			ps.setLong(4, id);
 			
 			int returned = ps.executeUpdate();
 
@@ -91,7 +79,7 @@ public class BookDAOJDBCImpl implements BookDAO{
 			e.printStackTrace();
 		} finally {
 			try {
-				statement.close();
+				ps.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -99,13 +87,12 @@ public class BookDAOJDBCImpl implements BookDAO{
 		
 	}
 
-	@Override
 	public List<Book> findAll() {
 		List<Book> bookList = new ArrayList<Book>();
-		statement = null;
 		Book book = null;
+		PreparedStatement ps= null;
 		try {
-			PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(FIND_ALL);
+			ps = ConnectionFactory.getConnection().prepareStatement(FIND_ALL);
 
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
@@ -119,7 +106,7 @@ public class BookDAOJDBCImpl implements BookDAO{
 			e.printStackTrace();
 		} finally {
 			try {
-				statement.close();
+				ps.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -128,13 +115,12 @@ public class BookDAOJDBCImpl implements BookDAO{
 		return bookList;
 	}
 
-	@Override
-	public Book findById(Long id) {
-		statement = null;
+	public Book findById(String id) {
+		PreparedStatement ps= null;
 		Book book = null;
 		try {
-			PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(FIND_BY_ID);
-			ps.setLong(1, id);
+			ps = ConnectionFactory.getConnection().prepareStatement(FIND_BY_ID);
+			ps.setString(1, id);
 			
 			ResultSet rs = ps.executeQuery();
 			
@@ -147,7 +133,7 @@ public class BookDAOJDBCImpl implements BookDAO{
 			e.printStackTrace();
 		} finally {
 			try {
-				statement.close();
+				ps.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -156,19 +142,18 @@ public class BookDAOJDBCImpl implements BookDAO{
 		return book;
 	}
 
-	@Override
-	public void delete(Long id) {
-		statement = null;
+	public void delete(String id) {
+		PreparedStatement ps= null;
 		try {
-			PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(DELETE);
-			ps.setLong(1, id);
+			ps = ConnectionFactory.getConnection().prepareStatement(DELETE);
+			ps.setString(1, id);
 			
 			int returned = ps.executeUpdate();
 
 			if(returned > 0){
-				System.out.printf("The book was saved with success!");
+				System.out.printf("The book was deleted with success!");
 			}else{
-				System.out.println("Failed to save a book!");
+				System.out.println("Failed to deleted a book!");
 			} 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -176,7 +161,7 @@ public class BookDAOJDBCImpl implements BookDAO{
 			e.printStackTrace();
 		} finally {
 			try {
-				statement.close();
+				ps.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -197,8 +182,6 @@ public class BookDAOJDBCImpl implements BookDAO{
 			book.setIsbn(rs.getString("isbn"));
 			book.setTitle(rs.getString("title"));
 			book.setPages(rs.getInt("pages"));
-			book.setPublicationYear(rs.getInt("publicationYear"));
-			book.setEditionNumber(rs.getInt("editionNumber"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
